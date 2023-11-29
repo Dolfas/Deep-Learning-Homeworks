@@ -21,6 +21,7 @@ def load_oct_data(bias=False, eq_test_dist=False, root="."):
     """
     path = os.path.join(root, "octmnist.npz")
     data = np.load(path)
+    #data = np.load('C:/Users/rodol/Desktop/1ºAno MEEC/1º Semestre/2º Quarter/AProf/Laboratory/Homework 1/Deep-Learning-Homeworks/octmnist.npz')
     train_X = data["train_images"].reshape([data["train_images"].shape[0], -1])/256
     dev_X = data["val_images"].reshape([data["val_images"].shape[0], -1])/256
     test_X = data["test_images"].reshape([data["test_images"].shape[0], -1])/256

@@ -46,7 +46,10 @@ class Perceptron(LinearModel):
         other arguments are ignored
         """
         # Q1.1a
-        raise NotImplementedError
+        if np.dot(self.W,x_i) != y_i:
+            self.W += y_i*x_i
+
+        #raise NotImplementedError
 
 
 class LogisticRegression(LinearModel):
