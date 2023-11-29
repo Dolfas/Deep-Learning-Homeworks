@@ -46,21 +46,36 @@ class Perceptron(LinearModel):
         other arguments are ignored
         """
         # Q1.1a
-        if np.dot(self.W,x_i) != y_i:
-            self.W += y_i*x_i
-
+        y_predicted = np.argmax(self.W.dot(x_i))
+        if y_predicted != y_i:
+            # Perceptron update.
+            self.W[y_i, :] +=  x_i
+            self. W[y_predicted, :] -= x_i
         #raise NotImplementedError
 
 
 class LogisticRegression(LinearModel):
-    def update_weight(self, x_i, y_i, learning_rate=0.001):
+    def update_weight(self, x_i, y_i, learning_rate):#0.001):
         """
         x_i (n_features): a single training example
         y_i: the gold label for that example
         learning_rate (float): keep it at the default value for your plots
         """
         # Q1.1b
-        raise NotImplementedError
+        # Get probability scores according to the model (num_labels x 1).
+        label_scores = np.expand_dims(self.W.dot(x_i), axis = 1)
+
+        # One-hot encode true label (num_labels x 1).
+        y_one_hot = np.zeros((np.size(self.W, 0),1))
+        y_one_hot[y_i] = 1
+
+        # Softmax function
+        # This gives the label probabilities according to the model (num_labels x 1).
+        label_probabilities = np.exp(label_scores) / np.sum(np.exp(label_scores))
+        
+        # SGD update. W is num_labels x num_features.
+        self.W = self.W + learning_rate * (y_one_hot - label_probabilities).dot(np.expand_dims(x_i, axis = 1).T)
+        #raise NotImplementedError
 
 
 class MLP(object):
