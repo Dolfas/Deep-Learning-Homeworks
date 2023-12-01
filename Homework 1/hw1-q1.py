@@ -84,7 +84,18 @@ class MLP(object):
     # in main().
     def __init__(self, n_classes, n_features, hidden_size):
         # Initialize an MLP with a single hidden layer.
-        raise NotImplementedError
+        #the number of hidden units in the hidden layer was set to 200 as per the question 1.2.2 information
+        self.hidden = []
+        units = [n_features, 200, n_classes]
+        W1 = np.random.normal(loc=0.1,scale=0.01,size=(units[1], units[0]))
+        W2 = np.random.normal(loc=0.1,scale=0.01,size=(units[2], units[1]))
+        
+        b1 = np.zeros(units[1],1)
+        b2 = np.zeros(units[2],1)
+
+        self.weights = [W1, W2]
+        self.biases = [b1, b2]        
+        #raise NotImplementedError
 
     def predict(self, X):
         # Compute the forward pass of the network. At prediction time, there is
@@ -107,7 +118,16 @@ class MLP(object):
         """
         Dont forget to return the loss of the epoch.
         """
-        raise NotImplementedError
+        #Activation function
+        #g = np.maximum(x, 0)
+        for t in range(len(np.shape(X)[0])):
+            for i in range(len(self.weights)):
+             if i == 0:
+                z_input = np.dot(self.weights[0],X[t,:])+self.biases[0]
+                h_input =  np.maximum(z_input, np.zeros(np.shape(z_input)[0],1))
+             else: 
+                z_output = np.dot(self.weights[1],h_input)+self.biases[1]
+        #raise NotImplementedError
 
 
 def plot(epochs, train_accs, val_accs):
