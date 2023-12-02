@@ -90,8 +90,8 @@ class MLP(object):
         W1 = np.random.normal(loc=0.1,scale=0.01,size=(units[1], units[0]))
         W2 = np.random.normal(loc=0.1,scale=0.01,size=(units[2], units[1]))
         
-        b1 = np.zeros(units[1],1)
-        b2 = np.zeros(units[2],1)
+        b1 = np.zeros((units[1],1))
+        b2 = np.zeros((units[2],1))
 
         self.weights = [W1, W2]
         self.biases = [b1, b2]        
@@ -178,10 +178,6 @@ class MLP(object):
         return np.average(loss)
 
 
-        #Loss Calculation
-
-
-        #Backward Prpogation
         #raise NotImplementedError
 
 
