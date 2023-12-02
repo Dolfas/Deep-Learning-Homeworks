@@ -110,13 +110,15 @@ class MLP(object):
                 h_input =  np.maximum(z_input, np.zeros(np.shape(z_input)[0],1))
              else: 
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
+
             predicted_values.append(z_output.argmax(axis=0))
 
         predicted_values = np.reshape(np.array(predicted_values), np.shape(np.shape(X)[0],))
         return predicted_values
 
         #raise NotImplementedError
-
+#python hw1-q1.py mlp
+#C:\Users\rodol\Desktop\1ºAno MEEC\1º Semestre\2º Quarter\AProf\Laboratory\Homework 1\Deep-Learning-Homeworks\Homework 1
     def evaluate(self, X, y):
         """
         X (n_examples x n_features)
@@ -140,13 +142,16 @@ class MLP(object):
              if i == 0:
                 z_input = np.dot(self.weights[0],np.reshape(X[t,:],(X[t,:].shape[0],1)))+self.biases[0]
                 h_input =  np.maximum(z_input, np.zeros((np.shape(z_input)[0],1)))
+
              else: 
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
+                print(z_output)
+                break
 
             probs = np.exp(z_output) / np.sum(np.exp(z_output))
             y_one_hot = np.zeros((np.shape(z_output)[0],1))
             y_one_hot[y[t]] = 1
-            loss.append(-y[t].dot(np.log(probs)))
+            loss.append(-np.transpose(y_one_hot).dot(np.log(probs)))
             #loss.append(1)
             #Backpropgation network
             grad_z = probs - y_one_hot
