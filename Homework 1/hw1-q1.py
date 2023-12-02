@@ -106,7 +106,7 @@ class MLP(object):
         for t in range((np.shape(X)[0])):
             for i in range(len(self.weights)):
              if i == 0:
-                z_input = np.dot(self.weights[0],X[t,:])+self.biases[0]
+                z_input = np.dot(self.weights[0],np.reshape(X[t,:],(X[t,:].shape[0],1)))+self.biases[0]
                 h_input =  np.maximum(z_input, np.zeros(np.shape(z_input)[0],1))
              else: 
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
@@ -138,16 +138,16 @@ class MLP(object):
 
             for i in range(len(self.weights)):
              if i == 0:
-                z_input = np.dot(self.weights[0],X[t,:])+self.biases[0]
-                h_input =  np.maximum(z_input, np.zeros(np.shape(z_input)[0],1))
+                z_input = np.dot(self.weights[0],np.reshape(X[t,:],(X[t,:].shape[0],1)))+self.biases[0]
+                h_input =  np.maximum(z_input, np.zeros((np.shape(z_input)[0],1)))
              else: 
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
 
             probs = np.exp(z_output) / np.sum(np.exp(z_output))
             y_one_hot = np.zeros((np.shape(z_output)[0],1))
-            y_one_hot[y] = 1
-            loss.append(-y.dot(np.log(probs)))
-
+            y_one_hot[y[t]] = 1
+            loss.append(-y[t].dot(np.log(probs)))
+            #loss.append(1)
             #Backpropgation network
             grad_z = probs - y_one_hot
             grad_weights = []
