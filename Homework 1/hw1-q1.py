@@ -133,7 +133,7 @@ class MLP(object):
         Dont forget to return the loss of the epoch.
         """
         loss = []
-        for t in range(len(np.shape(X)[0])): #per sample
+        for t in range((np.shape(X)[0])): #per sample
             #Foward Network
 
             for i in range(len(self.weights)):
