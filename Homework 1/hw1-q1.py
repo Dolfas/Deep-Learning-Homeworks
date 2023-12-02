@@ -103,7 +103,7 @@ class MLP(object):
         # at training time.
         predicted_values = []
 
-        for t in range(len(np.shape(X)[0])):
+        for t in range((np.shape(X)[0])):
             for i in range(len(self.weights)):
              if i == 0:
                 z_input = np.dot(self.weights[0],X[t,:])+self.biases[0]
