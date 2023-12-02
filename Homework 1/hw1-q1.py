@@ -48,7 +48,7 @@ class Perceptron(LinearModel):
         # Q1.1a
         y_predicted = np.argmax(self.W.dot(x_i))
         if y_predicted != y_i:
-            # Perceptron update.
+            # Perceptron update
             self.W[y_i, :] +=  x_i
             self. W[y_predicted, :] -= x_i
         #raise NotImplementedError
@@ -101,7 +101,21 @@ class MLP(object):
         # Compute the forward pass of the network. At prediction time, there is
         # no need to save the values of hidden nodes, whereas this is required
         # at training time.
-        raise NotImplementedError
+        predicted_values = []
+
+        for t in range(len(np.shape(X)[0])):
+            for i in range(len(self.weights)):
+             if i == 0:
+                z_input = np.dot(self.weights[0],X[t,:])+self.biases[0]
+                h_input =  np.maximum(z_input, np.zeros(np.shape(z_input)[0],1))
+             else: 
+                z_output = np.dot(self.weights[1],h_input)+self.biases[1]
+            predicted_values.append(z_output.argmax(axis=0))
+
+        predicted_values = np.reshape(np.array(predicted_values), np.shape(np.shape(X)[0],))
+        return predicted_values
+
+        #raise NotImplementedError
 
     def evaluate(self, X, y):
         """
@@ -118,15 +132,56 @@ class MLP(object):
         """
         Dont forget to return the loss of the epoch.
         """
-        #Activation function
-        #g = np.maximum(x, 0)
-        for t in range(len(np.shape(X)[0])):
+        loss = []
+        for t in range(len(np.shape(X)[0])): #per sample
+            #Foward Network
+
             for i in range(len(self.weights)):
              if i == 0:
                 z_input = np.dot(self.weights[0],X[t,:])+self.biases[0]
                 h_input =  np.maximum(z_input, np.zeros(np.shape(z_input)[0],1))
              else: 
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
+
+            probs = np.exp(z_output) / np.sum(np.exp(z_output))
+            y_one_hot = np.zeros((np.shape(z_output)[0],1))
+            y_one_hot[y] = 1
+            loss.append(-y.dot(np.log(probs)))
+
+            #Backpropgation network
+            grad_z = probs - y_one_hot
+            grad_weights = []
+            grad_biases = []
+            num_layers = len(self.weights)
+
+            for k in range(num_layers-1, -1, -1):
+        
+             # Gradient of hidden parameters.
+                h = X[t,:] if k == 0 else h_input
+                grad_weights.append(grad_z[:, None].dot(h[:, None].T))
+                grad_biases.append(grad_z)
+        
+                # Gradient of hidden layer below.
+                grad_h = self.weights[k].T.dot(grad_z)
+
+        # Gradient of hidden layer below before activation.
+                grad_z = grad_h * (1-h**2)   # Grad of loss wrt z3.
+
+        # Making gradient vectors have the correct order
+            grad_weights.reverse()
+            grad_biases.reverse()
+
+        for m in range(num_layers):
+            self.weights[m] -= learning_rate*grad_weights[m]
+            self.biases[m] -= learning_rate*grad_biases[m]
+
+        return np.average(loss)
+
+
+        #Loss Calculation
+
+
+        #Backward Prpogation
         #raise NotImplementedError
 
 
