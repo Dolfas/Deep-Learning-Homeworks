@@ -145,14 +145,12 @@ class MLP(object):
 
              else: 
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
-                print(z_output)
-                break
 
             probs = np.exp(z_output) / np.sum(np.exp(z_output))
             y_one_hot = np.zeros((np.shape(z_output)[0],1))
             y_one_hot[y[t]] = 1
             loss.append(-np.transpose(y_one_hot).dot(np.log(probs)))
-            #loss.append(1)
+            
             #Backpropgation network
             grad_z = probs - y_one_hot
             grad_weights = []
@@ -163,22 +161,24 @@ class MLP(object):
         
              # Gradient of hidden parameters.
                 h = X[t,:] if k == 0 else h_input
+                print(np.shape(h)) #h1 = (1,200) h2= (784,)
                 grad_weights.append(grad_z[:, None].dot(h[:, None].T))
                 grad_biases.append(grad_z)
+                
         
                 # Gradient of hidden layer below.
                 grad_h = self.weights[k].T.dot(grad_z)
 
         # Gradient of hidden layer below before activation.
-                grad_z = grad_h * (1-h**2)   # Grad of loss wrt z3.
+                grad_z = grad_h                                     #I HAVE ONE DOUBT HERE!!!!!!!!!!!!!!!!!  
 
         # Making gradient vectors have the correct order
             grad_weights.reverse()
             grad_biases.reverse()
 
-        for m in range(num_layers):
-            self.weights[m] -= learning_rate*grad_weights[m]
-            self.biases[m] -= learning_rate*grad_biases[m]
+            for m in range(num_layers):
+                self.weights[m] -= learning_rate*grad_weights[m]
+                self.biases[m] -= learning_rate*grad_biases[m]
 
         return np.average(loss)
 
