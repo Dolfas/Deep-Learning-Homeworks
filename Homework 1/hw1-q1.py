@@ -143,6 +143,7 @@ class MLP(object):
                 z_input = np.dot(self.weights[0],np.reshape(X[t,:],(X[t,:].shape[0],1)))+self.biases[0]
                 h_input =  np.maximum(z_input, np.zeros((np.shape(z_input)[0],1)))
                 if t == 0:
+                    print('The shape of input is: ', np.shape((X[t,:])))
                     print('The shape of input is: ', np.shape(np.reshape(X[t,:],(X[t,:].shape[0],1))))
                     print('The shape of z_input is: ', np.shape(z_input)) # 'the value of the z_input is: ', z_input)
                     print('The shape of h_input is: ', np.shape(h_input)) # 'the value of the h_input is: ', h_input)
