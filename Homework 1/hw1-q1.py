@@ -121,7 +121,7 @@ class MLP(object):
 #C:\Users\rodol\Desktop\1ºAno MEEC\1º Semestre\2º Quarter\AProf\Laboratory\Homework 1\Deep-Learning-Homeworks\Homework 1
     def evaluate(self, X, y):
         """
-        X (n_examples x n_features)
+        X (n_examples x n_features)  (97477, 784)
         y (n_examples): gold labels
         """
         # Identical to LinearModel.evaluate()
@@ -142,9 +142,17 @@ class MLP(object):
              if i == 0:
                 z_input = np.dot(self.weights[0],np.reshape(X[t,:],(X[t,:].shape[0],1)))+self.biases[0]
                 h_input =  np.maximum(z_input, np.zeros((np.shape(z_input)[0],1)))
+                if t == 0:
+                    print('The shape of input is: ', np.shape(np.reshape(X[t,:],(X[t,:].shape[0],1))))
+                    print('The shape of z_input is: ', np.shape(z_input)) # 'the value of the z_input is: ', z_input)
+                    print('The shape of h_input is: ', np.shape(h_input)) # 'the value of the h_input is: ', h_input)
 
              else: 
+                
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
+                if t == 0:
+                    print('The shape of z_output is: ', np.shape(z_output), 'the value of the z_output is: ', z_output)
+                    
 
             probs = np.exp(z_output) / np.sum(np.exp(z_output))
             y_one_hot = np.zeros((np.shape(z_output)[0],1))
@@ -169,7 +177,7 @@ class MLP(object):
                 grad_h = self.weights[k].T.dot(grad_z)
 
         # Gradient of hidden layer below before activation.
-                grad_z = grad_h                                     #I HAVE ONE DOUBT HERE!!!!!!!!!!!!!!!!!  
+                grad_z = grad_h                                     #THIS IS WRONG, MUST BE CORRECTED TO HAVE THE DERIVATIVE OF THE SOFTMAX
 
         # Making gradient vectors have the correct order
             grad_weights.reverse()
