@@ -160,9 +160,8 @@ class MLP(object):
             for k in range(num_layers-1, -1, -1):
         
              # Gradient of hidden parameters.
-                h = X[t,:] if k == 0 else h_input
-                print(np.shape(h)) #h1 = (1,200) h2= (784,)
-                grad_weights.append(grad_z[:, None].dot(h[:, None].T))
+                h = np.reshape(X[t,:],(X[t,:].shape[0],1)) if k == 0 else h_input #h1 = (1,200) h2= (784,)
+                grad_weights.append(grad_z.dot(h.T))
                 grad_biases.append(grad_z)
                 
         
