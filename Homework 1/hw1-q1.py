@@ -33,6 +33,7 @@ class LinearModel(object):
         y (n_examples): gold labels
         """
         y_hat = self.predict(X)
+        
         n_correct = (y == y_hat).sum()
         n_possible = y.shape[0]
         return n_correct / n_possible
@@ -107,13 +108,14 @@ class MLP(object):
             for i in range(len(self.weights)):
              if i == 0:
                 z_input = np.dot(self.weights[0],np.reshape(X[t,:],(X[t,:].shape[0],1)))+self.biases[0]
-                h_input =  np.maximum(z_input, np.zeros(np.shape(z_input)[0],1))
+                h_input =  np.maximum(z_input, np.zeros((np.shape(z_input)[0],1)))
              else: 
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
 
-            predicted_values.append(z_output.argmax(axis=0))
 
-        predicted_values = np.reshape(np.array(predicted_values), np.shape(np.shape(X)[0],))
+            predicted_values.append((z_output.argmax(axis=0)).tolist())
+
+        #predicted_values = np.reshape(np.array(predicted_values), np.shape(np.shape(X)[0],))
         return predicted_values
 
         #raise NotImplementedError
@@ -126,7 +128,7 @@ class MLP(object):
         """
         # Identical to LinearModel.evaluate()
         y_hat = self.predict(X)
-        n_correct = (y == y_hat).sum()
+        n_correct = (y[:,None] == y_hat).sum()
         n_possible = y.shape[0]
         return n_correct / n_possible
 
@@ -135,24 +137,15 @@ class MLP(object):
         Dont forget to return the loss of the epoch.
         """
         loss = []
-        for t in range((np.shape(X)[0])): #per sample
+        for t in range((np.shape(X)[0])): #per sample 
             #Foward Network
-
             for i in range(len(self.weights)):
              if i == 0:
                 z_input = np.dot(self.weights[0],np.reshape(X[t,:],(X[t,:].shape[0],1)))+self.biases[0]
                 h_input =  np.maximum(z_input, np.zeros((np.shape(z_input)[0],1)))
-                if t == 0:
-                    print('The shape of input is: ', np.shape((X[t,:])))
-                    print('The shape of input is: ', np.shape(np.reshape(X[t,:],(X[t,:].shape[0],1))))
-                    print('The shape of z_input is: ', np.shape(z_input)) # 'the value of the z_input is: ', z_input)
-                    print('The shape of h_input is: ', np.shape(h_input)) # 'the value of the h_input is: ', h_input)
-
              else: 
-                
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
-                if t == 0:
-                    print('The shape of z_output is: ', np.shape(z_output), 'the value of the z_output is: ', z_output)
+                
                     
             m = np.max(z_output, axis = 0)
             probs = np.exp(z_output-m) / np.sum(np.exp(z_output-m))
@@ -161,16 +154,13 @@ class MLP(object):
             loss.append(-np.transpose(y_one_hot).dot(np.log(probs + 10**-8)))
             
             #Backpropgation network
-            print(probs.shape)
-            print(y_one_hot)
+            
             grad_z = probs - y_one_hot
-            print(grad_z)
             grad_weights = []
             grad_biases = []
             num_layers = len(self.weights)
 
             for k in range(num_layers-1, -1, -1):
-        
              # Gradient of hidden parameters.
                 h = np.reshape(X[t,:],(X[t,:].shape[0],1)) if k == 0 else h_input #h1 = (1,200) h2= (784,)
                 grad_weights.append(grad_z.dot(h.T))
@@ -181,7 +171,7 @@ class MLP(object):
                 grad_h = self.weights[k].T.dot(grad_z)
 
         # Gradient of hidden layer below before activation.
-                grad_z = grad_h                                     #THIS IS WRONG, MUST BE CORRECTED TO HAVE THE DERIVATIVE OF THE SOFTMAX
+                grad_z = grad_h  
 
         # Making gradient vectors have the correct order
             grad_weights.reverse()
