@@ -154,14 +154,17 @@ class MLP(object):
                 if t == 0:
                     print('The shape of z_output is: ', np.shape(z_output), 'the value of the z_output is: ', z_output)
                     
-
-            probs = np.exp(z_output) / np.sum(np.exp(z_output))
+            m = np.max(z_output, axis = 0)
+            probs = np.exp(z_output-m) / np.sum(np.exp(z_output-m))
             y_one_hot = np.zeros((np.shape(z_output)[0],1))
             y_one_hot[y[t]] = 1
-            loss.append(-np.transpose(y_one_hot).dot(np.log(probs)))
+            loss.append(-np.transpose(y_one_hot).dot(np.log(probs + 10**-8)))
             
             #Backpropgation network
+            print(probs.shape)
+            print(y_one_hot)
             grad_z = probs - y_one_hot
+            print(grad_z)
             grad_weights = []
             grad_biases = []
             num_layers = len(self.weights)
