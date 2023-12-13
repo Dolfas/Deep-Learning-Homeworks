@@ -88,8 +88,8 @@ class MLP(object):
         #the number of hidden units in the hidden layer was set to 200 as per the question 1.2.2 information
         self.hidden = []
         units = [n_features, 200, n_classes]
-        W1 = np.random.normal(loc=0.1,scale=0.01,size=(units[1], units[0]))
-        W2 = np.random.normal(loc=0.1,scale=0.01,size=(units[2], units[1]))
+        W1 = np.random.normal(loc=0.1,scale=0.1,size=(units[1], units[0]))
+        W2 = np.random.normal(loc=0.1,scale=0.1,size=(units[2], units[1]))
         
         b1 = np.zeros((units[1],1))
         b2 = np.zeros((units[2],1))
