@@ -102,15 +102,18 @@ class MLP(object):
         # Compute the forward pass of the network. At prediction time, there is
         # no need to save the values of hidden nodes, whereas this is required
         # at training time.
+        def relu(x):
+            return np.maximum(0,x)
+        
         predicted_values = []
 
         for t in range((np.shape(X)[0])):
             for i in range(len(self.weights)):
              if i == 0:
                 z_input = np.dot(self.weights[0],np.reshape(X[t,:],(X[t,:].shape[0],1)))+self.biases[0]
-                h_input =  np.maximum(z_input, np.zeros((np.shape(z_input)[0],1)))
+                h_input2 = relu(z_input)
              else: 
-                z_output = np.dot(self.weights[1],h_input)+self.biases[1]
+                z_output = np.dot(self.weights[1],h_input2)+self.biases[1]
 
 
             predicted_values.append((z_output.argmax(axis=0)).tolist())
@@ -128,33 +131,45 @@ class MLP(object):
         """
         # Identical to LinearModel.evaluate()
         y_hat = self.predict(X)
-        n_correct = (y[:,None] == y_hat).sum()
+        #n_correct = (y[:,None] == y_hat).sum()
+        n_correct = 0
+        for i in range(y.shape[0]):
+            if y[i,None] == y_hat[i]:
+                n_correct +=1
         n_possible = y.shape[0]
         return n_correct / n_possible
 
-    def train_epoch(self, X, y, learning_rate=0.001):
+    def train_epoch(self, X, y, learning_rate):
         """
         Dont forget to return the loss of the epoch.
         """
         loss = []
+
+        def relu(x):
+            return np.maximum(0,x)
+        
         for t in range((np.shape(X)[0])): #per sample 
+            
+
             #Foward Network
             for i in range(len(self.weights)):
              if i == 0:
                 z_input = np.dot(self.weights[0],np.reshape(X[t,:],(X[t,:].shape[0],1)))+self.biases[0]
-                h_input =  np.maximum(z_input, np.zeros((np.shape(z_input)[0],1)))
+                h_input = relu(z_input)
+                #np.maximum(z_input, np.zeros((np.shape(z_input)[0],1)))                 
              else: 
                 z_output = np.dot(self.weights[1],h_input)+self.biases[1]
-                
-                    
+                                  
             m = np.max(z_output, axis = 0)
             probs = np.exp(z_output-m) / np.sum(np.exp(z_output-m))
+
             y_one_hot = np.zeros((np.shape(z_output)[0],1))
             y_one_hot[y[t]] = 1
-            loss.append(-np.transpose(y_one_hot).dot(np.log(probs + 10**-8)))
+            
+            loss.append(-np.transpose(y_one_hot).dot(np.log(probs + 10**-10)))
+          
             
             #Backpropgation network
-            
             grad_z = probs - y_one_hot
             grad_weights = []
             grad_biases = []
@@ -163,15 +178,15 @@ class MLP(object):
             for k in range(num_layers-1, -1, -1):
              # Gradient of hidden parameters.
                 h = np.reshape(X[t,:],(X[t,:].shape[0],1)) if k == 0 else h_input #h1 = (1,200) h2= (784,)
-                grad_weights.append(grad_z.dot(h.T))
+                grad_weights.append(grad_z.dot(np.transpose(h)))
                 grad_biases.append(grad_z)
-                
-        
                 # Gradient of hidden layer below.
-                grad_h = self.weights[k].T.dot(grad_z)
-
         # Gradient of hidden layer below before activation.
-                grad_z = grad_h  
+               # if h_input == 0:
+                   # grad_z = 0
+                #else: 
+                grad_h = self.weights[k].T.dot(grad_z)
+                grad_z = grad_h #alterar isto
 
         # Making gradient vectors have the correct order
             grad_weights.reverse()
@@ -180,8 +195,10 @@ class MLP(object):
             for m in range(num_layers):
                 self.weights[m] -= learning_rate*grad_weights[m]
                 self.biases[m] -= learning_rate*grad_biases[m]
+            
+            
 
-        return np.average(loss)
+        return np.sum(loss)
 
 
         #raise NotImplementedError
