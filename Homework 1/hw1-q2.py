@@ -27,10 +27,8 @@ class LogisticRegression(nn.Module):
         https://pytorch.org/docs/stable/nn.html
         """
         super().__init__()
-        # In a pytorch module, the declarations of layers needs to come after
-        # the super __init__ line, otherwise the magic doesn't work.
-        
-        self.linear = nn.Linear(n_features, n_classes) #Linear layer for logistic regression, automatically initialize weights and bias
+        #Linear combination, automatically initialize weights and bias
+        self.linear = nn.Linear(n_features, n_classes) 
 
     def forward(self, x, **kwargs):
         """
@@ -66,29 +64,32 @@ class FeedforwardNetwork(nn.Module):
         includes modules for several activation functions and dropout as well.
         """
         super().__init__()
-        # Implement me!
-        if activation_type == 'relu':
-            self.activation = nn.ReLU()
-        elif activation_type == 'tanh':
+      
+        #Define activation function
+        if activation_type == 'tanh':
             self.activation = nn.Tanh()
+        elif activation_type == 'relu':
+            self.activation = nn.ReLU()
         else:
             print('Invalid activation function, try "relu" or "tanh".')
 
-        self.layers = nn.ModuleList()
+        self.layers = nn.ModuleList() #List with network's architecture
 
+        #Input layer
         self.layers.append(nn.Linear(n_features, hidden_size))
         self.layers.append(self.activation)
-        self.layers.append(nn.Dropout(dropout))
+        self.layers.append(nn.Dropout(dropout)) #Input layer with dropout got better results
 
+        #Hidden Layers
         for i in range(layers):
             self.layers.append(nn.Linear(hidden_size, hidden_size))
             self.layers.append(self.activation)
             self.layers.append(nn.Dropout(dropout))
 
-        # Output layer
+        #Output layer
         self.layers.append(nn.Linear(hidden_size, n_classes))
-        self.layers.append(nn.Softmax(dim=1))
-
+        #No activation function in output because loss function does softmax
+  
     def forward(self, x, **kwargs):
         """
         x (batch_size x n_features): a batch of training examples
@@ -97,10 +98,9 @@ class FeedforwardNetwork(nn.Module):
         the output logits from x. This will include using various hidden
         layers, pointwise nonlinear functions, and dropout.
         """
-        for layer in self.layers:
-            x = layer(x)
+        for layer in self.layers: #For every layer in the defined layers list
+            x = layer(x) 
         return x
-
 
 def train_batch(X, y, model, optimizer, criterion, **kwargs):
     """
@@ -120,8 +120,7 @@ def train_batch(X, y, model, optimizer, criterion, **kwargs):
     This function should return the loss (tip: call loss.item()) to get the
     loss as a numerical value that is not part of the computation graph.
     """
-    model.train() #Model in training mode
-    optimizer.zero_grad() 
+    optimizer.zero_grad() #Reset gradient for new computation
     #Forward Pass
     y_hat = model(X) 
     loss = criterion(y_hat, y)
@@ -130,7 +129,7 @@ def train_batch(X, y, model, optimizer, criterion, **kwargs):
     #Weight update
     optimizer.step() # updates weights using the gradients.
 
-    return loss.item()
+    return loss.item() #.item() returns only the numerical value
 
 def predict(model, X): 
     """X (n_examples x n_features)"""
