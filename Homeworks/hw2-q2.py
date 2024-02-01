@@ -22,36 +22,47 @@ class CNN(nn.Module):
         self.no_maxpool = no_maxpool
         if not no_maxpool:
             # Implementation for Q2.1
-            raise NotImplementedError
+            self.conv1 = nn.Conv2d(1,8,kernel_size=3, stride = 1, padding='same')
+            self.conv2 = nn.Conv2d(8,16,kernel_size=3,stride=1, padding = 0)
+            self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
         else:
             # Implementation for Q2.2
-            raise NotImplementedError
-        
+            self.conv1 = nn.Conv2d(1,8, kernel_size = 3, stride = 2, padding=1)
+            self.conv2 = nn.Conv2d(8,16, kernel_size=3, stride=2,padding=0)
+            
         # Implementation for Q2.1 and Q2.2
-        raise NotImplementedError
-        
+        self.fc1 = nn.Linear(576,320)
+        self.drop = nn.Dropout(dropout_prob)
+        self.fc2 = nn.Linear(320,120)
+        self.fc3 = nn.Linear(120,4)
     def forward(self, x):
-        # input should be of shape [b, c, w, h]
+        # input should be of shape [b, c, w, h] - [batch, 1, 28, 28]
+        x = x.view([-1,1,28,28])
+
         # conv and relu layers
+        x = F.relu(self.conv1(x))
 
         # max-pool layer if using it
         if not self.no_maxpool:
-            raise NotImplementedError
-        
+            x = self.maxpool(x)
+
         # conv and relu layers
-        
+        x = F.relu(self.conv2(x))
 
         # max-pool layer if using it
         if not self.no_maxpool:
-            raise NotImplementedError
-        
+            x = self.maxpool(x)
+
         # prep for fully connected layer + relu
-        
+        x = x.view(-1,576)
+        x = F.relu(self.fc1(x))
+
         # drop out
         x = self.drop(x)
 
         # second fully connected layer + relu
-        
+        x = F.relu(self.fc2(x))
+
         # last fully connected layer
         x = self.fc3(x)
         
@@ -102,8 +113,9 @@ def plot(epochs, plottable, ylabel='', name=''):
 
 
 def get_number_trainable_params(model):
-    ## TO IMPLEMENT - REPLACE return 0
-    return 0
+    trainable_params = [param_tensor.numel() for param_tensor in model.parameters() 
+                        if param_tensor.requires_grad]
+    return sum(trainable_params)
 
 
 def main():
@@ -129,7 +141,7 @@ def main():
     dataset = utils.ClassificationDataset(data)
     train_dataloader = DataLoader(
         dataset, batch_size=opt.batch_size, shuffle=True)
-    dev_X, dev_y = dataset.dev_X, dataset.dev_y
+    dev_X, dev_y = dataset.dev_X, dataset.dev_y 
     test_X, test_y = dataset.test_X, dataset.test_y
 
     # initialize the model
